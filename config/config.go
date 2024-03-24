@@ -1,9 +1,10 @@
 package config
 
 import (
-	"BlogServ/logger"
 	"github.com/pelletier/go-toml/v2"
 	"io/ioutil"
+	"log"
+	"sync"
 )
 
 type Config struct {
@@ -31,16 +32,23 @@ type Config struct {
 	}
 }
 
-func NewConfig() *Config {
-	data, err := ioutil.ReadFile("../config.toml")
-	if err != nil {
-		logger.Fatal("打开配置文件global.toml失败,请检查文件是否存在")
-	}
+var config *Config
+var once sync.Once
 
-	var config Config
-	if err = toml.Unmarshal(data, &config); err != nil {
-		logger.Fatal("解析配置失败,请检查配置是否正确")
-	}
+// FetchConfig 单例配置对象
+func FetchConfig() *Config {
+	once.Do(func() {
+		data, err := ioutil.ReadFile("../config.toml")
+		if err != nil {
+			log.Fatal("打开配置文件global.toml失败,请检查文件是否存在")
+		}
 
-	return &config
+		if err = toml.Unmarshal(data, &config); err != nil {
+			log.Fatal("解析配置失败,请检查配置是否正确")
+		}
+
+		log.Println("初始化系统配置成功")
+	})
+
+	return config
 }

@@ -1,11 +1,13 @@
 package logger
 
 import (
+	"BlogServ/config"
 	"fmt"
 	"io"
 	"os"
 	"path"
 	"runtime"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -21,11 +23,40 @@ var log = &logger{
 }
 
 func init() {
-	log.l.SetOutput(os.Stdout)
+	// 日志输出路径
+	logFile, err := os.OpenFile("../logs/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.l.Errorf("无法打开日志文件：%v", err)
+	}
+	//defer func(logFile *os.File) {
+	//	err := logFile.Close()
+	//	if err != nil {
+	//		log.l.Errorf("关闭日志文件失败：%v", err)
+	//	}
+	//}(logFile)
+
+	writers := io.MultiWriter(logFile, os.Stdout)
+	log.l.SetOutput(writers)
+
+	// 日志时间格式
 	log.l.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02T15:04:05",
 	})
 
+	// 日志等级
+	var level logrus.Level
+	c := config.FetchConfig()
+	logLevel := strings.ToUpper(c.Logging.Level)
+	if logLevel == "DEBUG" {
+		level = logrus.DebugLevel
+	} else if logLevel == "INFO" {
+		level = logrus.InfoLevel
+	} else if logLevel == "ERROR" {
+		level = logrus.ErrorLevel
+	} else if logLevel == "FATAL" {
+		level = logrus.FatalLevel
+	}
+	log.l.SetLevel(level)
 }
 
 // getCallerInfo 获取调用者的函数名，调用行
@@ -45,17 +76,6 @@ func (l *logger) getCallerInfo() {
 // printer 日志处理函数
 func (l *logger) printer(level logrus.Level, msg ...interface{}) {
 	log.getCallerInfo()
-
-	logFile, err := os.OpenFile("../logs/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		l.l.Fatalf("无法打开日志文件：%v", err)
-	}
-	defer logFile.Close()
-
-	writers := io.MultiWriter(logFile, os.Stdout)
-
-	l.l.SetOutput(writers)
-
 	l.l.WithFields(logrus.Fields{"filePath": l.fp, "func": l.funcn}).Log(level, msg...)
 }
 
