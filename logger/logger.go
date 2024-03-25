@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var BaseDir = "/etc/blogserv"
+
 type logger struct {
 	fp    string
 	funcn string
@@ -24,7 +26,7 @@ var log = &logger{
 
 func init() {
 	// 日志输出路径
-	logFile, err := os.OpenFile("../logs/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(BaseDir+"/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.l.Errorf("无法打开日志文件：%v", err)
 	}

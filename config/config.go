@@ -35,10 +35,12 @@ type Config struct {
 var config *Config
 var once sync.Once
 
+var BaseDir = "/etc/blogserv"
+
 // FetchConfig 单例配置对象
 func FetchConfig() *Config {
 	once.Do(func() {
-		data, err := ioutil.ReadFile("../config.toml")
+		data, err := ioutil.ReadFile(BaseDir + "/config.toml")
 		if err != nil {
 			log.Fatal("打开配置文件global.toml失败,请检查文件是否存在")
 		}
