@@ -110,3 +110,7 @@ func Errorf(format string, msg ...interface{}) {
 func Fatal(msg ...interface{}) {
 	log.printer(logrus.FatalLevel, msg...)
 }
+
+func Fatalf(format string, msg ...interface{}) {
+	log.printerf(logrus.FatalLevel, format, msg...)
+}

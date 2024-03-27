@@ -3,16 +3,29 @@ package data
 import (
 	"BlogServ/config"
 	"BlogServ/models"
-	"fmt"
 	"testing"
 )
 
-func TestInitDB(t *testing.T) {
-	c := config.FetchConfig()
-	//fmt.Println(c)
-	db := InitDB(c)
-	//db.Create(&models.User{Username: "test", Password: "test"})
-	var user models.User
-	db.First(&user, 1)
-	fmt.Println(user.Username)
+var c *config.Config
+
+//func TestInitDB(t *testing.T) {
+//	c = config.FetchConfig()
+//	//fmt.Println(c)
+//	db := InitDB(c)
+//	//db.Create(&models.User{Username: "test", Password: "test"})
+//	var user models.User
+//	db.First(&user, 1)
+//	fmt.Println(user.Username, user.Password)
+//}
+
+func TestInitDBPool(t *testing.T) {
+	c = config.FetchConfig()
+	initDBPool(&c.Database)
+}
+
+func TestMigrate(t *testing.T) {
+	c = config.FetchConfig()
+	dbPool := initDBPool(&c.Database)
+	// 测试数据库表迁移
+	Migrate(dbPool, &models.User{})
 }

@@ -7,29 +7,37 @@ import (
 	"sync"
 )
 
+type Server struct {
+	Address string `toml:"address"`
+	Port    int    `toml:"port"`
+	Timeout int    `toml:"timeout"`
+}
+
+type Database struct {
+	Driver   string `toml:"driver"`
+	Host     string `toml:"host"`
+	Port     int    `toml:"port"`
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+	Database string `toml:"database"`
+	MaxConn  int    `toml:"maxConn"`
+	IdleConn int    `toml:"idleConn"`
+}
+
+type Common struct {
+	Environment string `toml:"environment"`
+}
+
+type Logging struct {
+	Level   string `toml:"level"`
+	Enabled bool   `toml:"enabled"`
+}
+
 type Config struct {
-	Server struct {
-		Address string `toml:"address"`
-		Port    int    `toml:"port"`
-		Timeout int    `toml:"timeout"`
-	}
-
-	Database struct {
-		Host     string `toml:"host"`
-		Port     int    `toml:"port"`
-		Username string `toml:"username"`
-		Password string `toml:"password"`
-		Database string `toml:"database"`
-	}
-
-	Common struct {
-		Environment string `toml:"environment"`
-	}
-
-	Logging struct {
-		Level   string `toml:"level"`
-		Enabled bool   `toml:"enabled"`
-	}
+	Server   Server
+	Database Database
+	Common   Common
+	Logging  Logging
 }
 
 var config *Config
