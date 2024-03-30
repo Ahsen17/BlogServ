@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"sync"
 )
 
 //database 选择mysql
@@ -40,10 +41,18 @@ import (
 
 var (
 	dbPool *sql.DB
+	lock   sync.Mutex
 )
 
 // InitDBPool 初始化数据库连接池
-func initDBPool(db *config.Database) *sql.DB {
+func InitDBPool(db *config.Database) *sql.DB {
+	if dbPool != nil {
+		return dbPool
+	}
+
+	lock.Lock()
+	defer lock.Unlock()
+
 	driverName := db.Driver
 	dsn := "%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local"
 	dataSourceName := fmt.Sprintf(dsn, db.Username, db.Password, db.Host, db.Port, db.Database)

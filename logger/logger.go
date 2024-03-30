@@ -47,7 +47,7 @@ func init() {
 
 	// 日志等级
 	var level logrus.Level
-	c := config.FetchConfig()
+	c := config.NewConfig()
 	logLevel := strings.ToUpper(c.Logging.Level)
 	if logLevel == "DEBUG" {
 		level = logrus.DebugLevel
@@ -97,6 +97,10 @@ func Infof(format string, msg ...interface{}) {
 
 func Debug(msg ...interface{}) {
 	log.printer(logrus.DebugLevel, msg...)
+}
+
+func Debugf(format string, msg ...interface{}) {
+	log.printerf(logrus.DebugLevel, format, msg...)
 }
 
 func Error(msg ...interface{}) {

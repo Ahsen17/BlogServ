@@ -19,13 +19,13 @@ var c *config.Config
 //}
 
 func TestInitDBPool(t *testing.T) {
-	c = config.FetchConfig()
-	initDBPool(&c.Database)
+	c = config.NewConfig()
+	InitDBPool(&c.Database)
 }
 
 func TestMigrate(t *testing.T) {
-	c = config.FetchConfig()
-	dbPool := initDBPool(&c.Database)
+	c = config.NewConfig()
+	dbPool := InitDBPool(&c.Database)
 	// 测试数据库表迁移
 	Migrate(dbPool, &models.User{})
 }
