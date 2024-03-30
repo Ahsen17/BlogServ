@@ -99,6 +99,10 @@ func Debug(msg ...interface{}) {
 	log.printer(logrus.DebugLevel, msg...)
 }
 
+func Debugf(format string, msg ...interface{}) {
+	log.printerf(logrus.DebugLevel, format, msg...)
+}
+
 func Error(msg ...interface{}) {
 	log.printer(logrus.ErrorLevel, msg...)
 }
