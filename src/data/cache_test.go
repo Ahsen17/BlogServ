@@ -8,7 +8,7 @@ import (
 
 func TestCache_InitClient(t *testing.T) {
 	c := config.NewConfig()
-	client := InitClient(&c.Cache)
+	client := InitCache(&c.Cache)
 	defer client.Close()
 
 	//client.Set("key", "11111", 0).Err()
