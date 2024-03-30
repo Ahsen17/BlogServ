@@ -20,12 +20,12 @@ var c *config.Config
 
 func TestInitDBPool(t *testing.T) {
 	c = config.NewConfig()
-	InitDBPool(&c.Database)
+	InitDBClient(&c.Database)
 }
 
 func TestMigrate(t *testing.T) {
 	c = config.NewConfig()
-	dbPool := InitDBPool(&c.Database)
+	dbPool := InitDBClient(&c.Database)
 	// 测试数据库表迁移
 	Migrate(dbPool, &models.User{})
 }
