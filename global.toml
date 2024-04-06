@@ -1,0 +1,30 @@
+[server]
+address = "127.0.0.1"
+port = 9090
+timeout = 60
+
+[database]
+driver = "mysql"
+host = "127.0.0.1"
+port = 3306
+username = "root"
+password = ""
+database = ""
+maxConn = 2000
+idleConn = 1000
+
+[common]
+# env: dev|test|prod
+enviroment = "dev"
+
+[logging]
+level = "DEBUG"
+enabled = true
+
+[cache]
+host = "127.0.0.1"
+port = 6379
+password = ""
+database = 0
+
+[queue]

@@ -7,8 +7,7 @@ import (
 
 // 测试获取Server相关的配置属性
 func TestFetchConfig(t *testing.T) {
-	c := NewConfig()
-	c2 := NewConfig()
+	c := AllConfig()
 	//sc := c.Server
-	fmt.Println(c == c2)
+	fmt.Println(c)
 }

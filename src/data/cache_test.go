@@ -1,14 +1,12 @@
 package data
 
 import (
-	"BlogServ/config"
 	"BlogServ/logger"
 	"testing"
 )
 
-func TestCache_InitClient(t *testing.T) {
-	c := config.NewConfig()
-	client := InitCache(&c.Cache)
+func TestCache(t *testing.T) {
+	client := CacheClient()
 	defer client.Close()
 
 	//client.Set("key", "11111", 0).Err()

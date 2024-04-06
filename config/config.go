@@ -54,17 +54,11 @@ var lock sync.Mutex
 var BaseDir = "/etc/blogserv"
 
 // NewConfig 单例配置对象
-func NewConfig() *Config {
-	if config != nil {
-		return config
-	}
-
-	lock.Lock()
-	defer lock.Unlock()
-
+func init() {
+	// 本地开发使用config.toml配置,拉取源码时需要修改为global.toml
 	data, err := ioutil.ReadFile(BaseDir + "/config.toml")
 	if err != nil {
-		log.Fatal("打开配置文件global.toml失败,请检查文件是否存在")
+		log.Fatal("打开配置文件失败,请检查文件是否存在")
 	}
 
 	if err = toml.Unmarshal(data, &config); err != nil {
@@ -72,6 +66,30 @@ func NewConfig() *Config {
 	}
 
 	log.Println("初始化系统配置成功")
+}
 
+func AllConfig() *Config {
 	return config
+}
+
+func ServerConfig() *Server {
+	return &config.Server
+}
+
+// DBConfig 获取数据库配置
+func DBConfig() *Database {
+	return &config.Database
+}
+
+func CacheConfig() *Cache {
+	return &config.Cache
+}
+
+// CommonConfig 获取数据库配置
+func CommonConfig() *Common {
+	return &config.Common
+}
+
+func LoggingConfig() *Logging {
+	return &config.Logging
 }

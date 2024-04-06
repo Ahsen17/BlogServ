@@ -12,7 +12,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var BaseDir = "/etc/blogserv"
+const (
+	BASEDIR = "/etc/blogserv"
+
+	DEBUG = "DEBUG"
+	INFO  = "INFO"
+	ERROR = "ERROR"
+)
 
 type logger struct {
 	fp    string
@@ -20,13 +26,15 @@ type logger struct {
 	l     *logrus.Logger
 }
 
-var log = &logger{
-	l: logrus.New(),
-}
+var (
+	log = &logger{
+		l: logrus.New(),
+	}
+)
 
 func init() {
 	// 日志输出路径
-	logFile, err := os.OpenFile(BaseDir+"/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(BASEDIR+"/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.l.Errorf("无法打开日志文件：%v", err)
 	}
@@ -47,16 +55,15 @@ func init() {
 
 	// 日志等级
 	var level logrus.Level
-	c := config.NewConfig()
+	c := config.AllConfig()
 	logLevel := strings.ToUpper(c.Logging.Level)
-	if logLevel == "DEBUG" {
+	switch logLevel {
+	case DEBUG:
 		level = logrus.DebugLevel
-	} else if logLevel == "INFO" {
+	case INFO:
 		level = logrus.InfoLevel
-	} else if logLevel == "ERROR" {
+	case ERROR:
 		level = logrus.ErrorLevel
-	} else if logLevel == "FATAL" {
-		level = logrus.FatalLevel
 	}
 	log.l.SetLevel(level)
 }

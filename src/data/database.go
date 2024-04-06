@@ -21,13 +21,8 @@ const (
 )
 
 // InitDBClient 初始化数据库连接池
-func InitDBClient(dbConf *config.Database) *gorm.DB {
-	if client != nil {
-		return client
-	}
-
-	lock.Lock()
-	defer lock.Unlock()
+func init() {
+	dbConf := config.DBConfig()
 
 	driverName := dbConf.Driver
 	dsn := "%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local"
@@ -62,7 +57,6 @@ func InitDBClient(dbConf *config.Database) *gorm.DB {
 	connPool.SetMaxIdleConns(dbConf.IdleConn)
 
 	logger.Info("数据库连接池初始化完成")
-	return client
 }
 
 // Migrate 迁移数据库表
@@ -77,8 +71,6 @@ func Migrate(objs ...interface{}) error {
 	return nil
 }
 
-func GetData(clue interface{}) (string, error) {
-	var err error
-
-	return "", err
+func DBClient() *gorm.DB {
+	return client
 }

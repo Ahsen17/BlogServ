@@ -17,12 +17,12 @@ const (
 
 type Account struct {
 	gorm.Model
-	Username    string
-	Password    string
-	Token       string
-	EnableToken bool
-	Status      uint
-	User        User
+	Username   string
+	Password   string
+	Sign       string
+	EnableSign bool
+	Status     uint
+	User       User
 
 	Role   Role
 	RoleID uint
