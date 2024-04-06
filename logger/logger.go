@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"BlogServ/config"
 	"fmt"
 	"io"
 	"os"
@@ -9,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/ahsen17/BlogServ/config"
 	"github.com/sirupsen/logrus"
 )
 

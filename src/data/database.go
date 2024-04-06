@@ -1,18 +1,17 @@
 package data
 
 import (
-	"BlogServ/config"
-	"BlogServ/logger"
 	"database/sql"
 	"fmt"
+
+	"github.com/ahsen17/BlogServ/config"
+	"github.com/ahsen17/BlogServ/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"sync"
 )
 
 var (
 	client *gorm.DB
-	lock   sync.Mutex
 )
 
 const (

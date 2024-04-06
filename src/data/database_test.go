@@ -1,12 +1,10 @@
 package data
 
 import (
-	"BlogServ/config"
-	"BlogServ/models"
 	"testing"
-)
 
-var c *config.Config
+	"github.com/ahsen17/BlogServ/models"
+)
 
 //func TestInitDB(t *testing.T) {
 //	c = config.FetchConfig()
@@ -19,11 +17,10 @@ var c *config.Config
 //}
 
 func TestInitDBPool(t *testing.T) {
-	InitDBClient(config.DBConfig())
+	DBClient()
 }
 
 func TestMigrate(t *testing.T) {
-	InitDBClient(config.DBConfig())
 	dbPool := DBClient()
 	// 测试数据库表迁移
 	Migrate(dbPool, &models.User{})

@@ -1,8 +1,9 @@
 package data
 
 import (
-	"BlogServ/config"
 	"fmt"
+
+	"github.com/ahsen17/BlogServ/config"
 	"github.com/go-redis/redis"
 )
 
