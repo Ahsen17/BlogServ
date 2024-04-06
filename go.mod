@@ -1,4 +1,4 @@
-module BlogServ
+module github.com/ahsen17/BlogServ
 
 go 1.18
 
