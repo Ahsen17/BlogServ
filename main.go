@@ -1,20 +1,19 @@
 package main
 
 import (
-	"BlogServ/logger"
-	"fmt"
+	"github.com/ahsen17/BlogServ/logger"
+	"github.com/ahsen17/BlogServ/src"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	logger.Info("test")
+	r := gin.Default()
+	r.SetTrustedProxies([]string{"localhost"})
 
-	fmt.Println("hello golang")
-	//r := gin.Default()
-	//r.GET("/ping", func(c *gin.Context) {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"message": "pong",
-	//	})
-	//})
-	//
-	//r.Run(":9091")
+	src.InitRouter(r)
+	err := r.Run(":9090")
+	if err != nil {
+		logger.Errorf("服务启动失败: %s", err)
+		panic(err)
+	}
 }
