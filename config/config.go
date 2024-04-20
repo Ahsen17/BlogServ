@@ -4,7 +4,6 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"io/ioutil"
 	"log"
-	"sync"
 )
 
 type Server struct {
@@ -48,15 +47,30 @@ type Config struct {
 	Logging  Logging
 }
 
-var config *Config
-var lock sync.Mutex
+const (
+	DEVENV  = "dev"
+	TESTENV = "test"
+	PRODENV = "prod"
+)
 
-var BaseDir = "/etc/blogserv"
+var (
+	config *Config
+)
+
+//global variables
+var (
+	projectEnv = DEVENV
+	configFile string
+
+	ConfDir = "/etc/blogserv"
+)
 
 // NewConfig 单例配置对象
 func init() {
+	InitGlobalVar()
+
 	// 本地开发使用config.toml配置,拉取源码时需要修改为global.toml
-	data, err := ioutil.ReadFile(BaseDir + "/config.toml")
+	data, err := ioutil.ReadFile(ConfDir + configFile)
 	if err != nil {
 		log.Fatal("打开配置文件失败,请检查文件是否存在")
 	}
@@ -66,6 +80,21 @@ func init() {
 	}
 
 	log.Println("初始化系统配置成功")
+}
+
+func InitGlobalVar() {
+	if projectEnv == DEVENV {
+		// 开发环境
+		configFile = "/config.toml"
+	} else if projectEnv == TESTENV {
+		// 测试环境
+		configFile = ""
+	} else if projectEnv == PRODENV {
+		// 生产环境
+		configFile = "/global.toml"
+	} else {
+		configFile = ""
+	}
 }
 
 func AllConfig() *Config {
@@ -85,11 +114,12 @@ func CacheConfig() *Cache {
 	return &config.Cache
 }
 
-// CommonConfig 获取数据库配置
+// CommonConfig 获取Common配置
 func CommonConfig() *Common {
 	return &config.Common
 }
 
+// LoggingConfig 获取日志配置
 func LoggingConfig() *Logging {
 	return &config.Logging
 }
