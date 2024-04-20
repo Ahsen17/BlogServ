@@ -1,22 +1,42 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/ahsen17/BlogServ/src/api"
+	"github.com/gin-gonic/gin"
+
+	swaggerDocs "github.com/ahsen17/BlogServ/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // 参考下开源项目RouterGroup的用法
 
 // InitRouter 初始化应用路由
 func InitRouter(engine *gin.Engine) {
+	// 系统路由
 	mainGrp := engine.Group("")
-	mainGrp.GET("/", MainHandler)
-	mainGrp.GET("/404", NotFoundHandler)
-	mainGrp.GET("/500", ServerErrorHandler)
+	{
+		mainGrp.GET("/", MainHandler)
+		mainGrp.GET("/404", NotFoundHandler)
+		mainGrp.GET("/500", ServerErrorHandler)
+	}
 
 	// 应用接口
-	apiGrp := engine.Group("/api")
-	apiGrp.Any("", NotFoundHandler)
+	apiV1Grp := "/api/v1"
+	swaggerDocs.SwaggerInfo.BasePath = apiV1Grp
+	// 接口version 1
+	v1Grp := engine.Group(apiV1Grp)
+	{
+		v1Grp.GET("/example", api.SwaggerExample)
+	}
+
+	// 其他路由
+	{
+		// swagger接口文档
+		engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 }
 
 // MainHandler 主页

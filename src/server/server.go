@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/config"
 	"github.com/ahsen17/BlogServ/logger"
-	"github.com/ahsen17/BlogServ/src/router"
+	"github.com/ahsen17/BlogServ/router"
 	"github.com/gin-gonic/gin"
 )
 
