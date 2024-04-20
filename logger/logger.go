@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	BASEDIR = "/etc/blogserv"
-
 	DEBUG = "DEBUG"
 	INFO  = "INFO"
 	ERROR = "ERROR"
@@ -33,20 +31,7 @@ var (
 )
 
 func init() {
-	// 日志输出路径
-	logFile, err := os.OpenFile(BASEDIR+"/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.l.Errorf("无法打开日志文件：%v", err)
-	}
-	//defer func(logFile *os.File) {
-	//	err := logFile.Close()
-	//	if err != nil {
-	//		log.l.Errorf("关闭日志文件失败：%v", err)
-	//	}
-	//}(logFile)
-
-	writers := io.MultiWriter(logFile, os.Stdout)
-	log.l.SetOutput(writers)
+	lc := config.LoggingConfig()
 
 	// 日志时间格式
 	log.l.SetFormatter(&logrus.JSONFormatter{
@@ -55,8 +40,7 @@ func init() {
 
 	// 日志等级
 	var level logrus.Level
-	c := config.AllConfig()
-	logLevel := strings.ToUpper(c.Logging.Level)
+	logLevel := strings.ToUpper(lc.Level)
 	switch logLevel {
 	case DEBUG:
 		level = logrus.DebugLevel
@@ -66,6 +50,19 @@ func init() {
 		level = logrus.ErrorLevel
 	}
 	log.l.SetLevel(level)
+
+	// 日志输出路径
+	if lc.EnableOutput == false {
+		return
+	}
+
+	logFile, err := os.OpenFile(lc.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.l.Errorf("无法打开日志文件：%v", err)
+	}
+
+	writers := io.MultiWriter(logFile, os.Stdout)
+	log.l.SetOutput(writers)
 }
 
 // getCallerInfo 获取调用者的函数名，调用行

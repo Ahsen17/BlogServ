@@ -35,8 +35,9 @@ type Common struct {
 }
 
 type Logging struct {
-	Level   string `toml:"level"`
-	Enabled bool   `toml:"enabled"`
+	Level        string `toml:"level"`
+	LogFile      string `toml:"logFile"`
+	EnableOutput bool   `toml:"enableOutput"`
 }
 
 type Config struct {
@@ -48,21 +49,20 @@ type Config struct {
 }
 
 const (
-	DEVENV  = "dev"
-	TESTENV = "test"
-	PRODENV = "prod"
+	DEV  = "dev"
+	TEST = "test"
+	PROD = "prod"
 )
 
 var (
 	config *Config
 )
 
-//global variables
+// global variables
 var (
-	projectEnv = DEVENV
-	configFile string
-
-	ConfDir = "/etc/blogserv"
+	ConfFile   string
+	ConfDir    string
+	ProjectEnv string
 )
 
 // NewConfig 单例配置对象
@@ -70,9 +70,9 @@ func init() {
 	InitGlobalVar()
 
 	// 本地开发使用config.toml配置,拉取源码时需要修改为global.toml
-	data, err := ioutil.ReadFile(ConfDir + configFile)
+	data, err := ioutil.ReadFile(ConfDir + ConfFile)
 	if err != nil {
-		log.Fatal("打开配置文件失败,请检查文件是否存在")
+		log.Fatalf("读取配置文件失败,请检查文件[%s]是否存在", ConfFile)
 	}
 
 	if err = toml.Unmarshal(data, &config); err != nil {
@@ -83,17 +83,16 @@ func init() {
 }
 
 func InitGlobalVar() {
-	if projectEnv == DEVENV {
-		// 开发环境
-		configFile = "/config.toml"
-	} else if projectEnv == TESTENV {
-		// 测试环境
-		configFile = ""
-	} else if projectEnv == PRODENV {
-		// 生产环境
-		configFile = "/global.toml"
-	} else {
-		configFile = ""
+	ConfDir = "./"
+
+	ProjectEnv = DEV
+	switch ProjectEnv {
+	case DEV:
+		ConfFile = "dev.toml"
+	case TEST:
+		ConfFile = "test.toml"
+	default:
+		ConfFile = "config.toml"
 	}
 }
 
