@@ -56,6 +56,16 @@ func init() {
 		return
 	}
 
+	if _, err := os.Stat(lc.LogFile); err != nil {
+		// 若日志文件不存在则创建
+		logFile, ierr := os.Create(lc.LogFile)
+		if ierr != nil {
+			log.l.Errorf("创建日志文件失败,请检查日志目录是否存在")
+			return
+		}
+		defer logFile.Close()
+	}
+
 	logFile, err := os.OpenFile(lc.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.l.Errorf("无法打开日志文件：%v", err)
