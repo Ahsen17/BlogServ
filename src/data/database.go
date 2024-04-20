@@ -40,7 +40,9 @@ func init() {
 	}
 
 	var connPool *sql.DB
-	if client, err := gorm.Open(conn, &gorm.Config{}); err != nil {
+	var err error
+	client, err = gorm.Open(conn, &gorm.Config{})
+	if err != nil {
 		logger.Errorf("连接数据库失败: %s", err)
 		panic(err)
 	} else {
@@ -56,18 +58,6 @@ func init() {
 	connPool.SetMaxIdleConns(dbConf.IdleConn)
 
 	logger.Info("数据库连接池初始化完成")
-}
-
-// Migrate 迁移数据库表
-func Migrate(objs ...interface{}) error {
-	// 迭代迁移数据库表
-	if err := client.AutoMigrate(objs); err != nil {
-		logger.Errorf("数据库表迁移失败")
-		return err
-	}
-
-	logger.Info("数据库表迁移完成")
-	return nil
 }
 
 func DBClient() *gorm.DB {
