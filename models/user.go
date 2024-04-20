@@ -8,26 +8,6 @@ const (
 	MANAGER   = "manager"
 )
 
-const (
-	ACTIVE     = 1
-	DEACTIVATE = 2
-	REVOKE     = 3
-	BANED      = 9
-)
-
-type Account struct {
-	gorm.Model
-	Username   string
-	Password   string
-	Sign       string
-	EnableSign bool
-	Status     uint
-	User       User
-
-	Role   Role
-	RoleID uint
-}
-
 type Role struct {
 	ID    uint `gorm:"primary_key;"`
 	Name  string
