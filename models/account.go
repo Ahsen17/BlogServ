@@ -1,10 +1,5 @@
 package models
 
-import (
-	"github.com/ahsen17/BlogServ/src/data"
-	"time"
-)
-
 const (
 	ACTIVE     = 1
 	DEACTIVATE = 2
@@ -25,19 +20,41 @@ type Account struct {
 	UpdateBy string `json:"update_by"`
 }
 
-// Register 账户注册
-func (ac *Account) Register() error {
-	now := time.Now().Unix()
-	regSql := "INSERT INTO `account`(username, password, create_at, create_by, update_at, update_by) values (?,?,?,?,?,?)"
-	client := data.DBClient()
-	// 虽然用了gorm框架,但最终还是决定用原生sql
-	// 需要确定后续是否更换orm框架
-	client.Raw(
-		regSql,
-		ac.Username, ac.Password,
-		now, DefaultAccount,
-		now, DefaultAccount,
-	).Scan(&ac)
+type AccountData struct {
+	LastLoginTime int64
+	LastLoginIp   string
+}
 
+type AccountMgr struct {
+	Account     *Account
+	AccountData *AccountData
+
+	UserMgr      *UserMgr
+	RoleMgr      *RoleMgr
+	CustomLogMgr *CustomLogMgr // 用户操作日志
+}
+
+// Register 用户注册
+func (mgr *AccountMgr) Register() error {
+	return nil
+}
+
+// Login 用户登录
+func (mgr *AccountMgr) Login() error {
+	return nil
+}
+
+// Logout 用户登出
+func (mgr *AccountMgr) Logout() error {
+	return nil
+}
+
+// Edit 更新用户信息
+func (mgr *AccountMgr) Edit() error {
+	return nil
+}
+
+// Revoke 注销用户
+func (mgr *AccountMgr) Revoke() error {
 	return nil
 }
