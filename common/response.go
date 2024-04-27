@@ -13,6 +13,7 @@ const (
 
 type Response struct {
 	Code    int         `json:"code"`
+	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
@@ -22,8 +23,9 @@ type ResponseMgr struct {
 	Response Response
 }
 
-func (mgr ResponseMgr) BASE(code int, msg string, data interface{}) {
+func (mgr ResponseMgr) BASE(code int, success bool, msg string, data interface{}) {
 	mgr.Response.Code = code
+	mgr.Response.Success = success
 	mgr.Response.Message = msg
 	mgr.Response.Data = data
 	mgr.Ctx.JSON(code, &mgr.Response)
@@ -34,7 +36,7 @@ func (mgr ResponseMgr) OK(msg string, data interface{}) {
 	if msg == "" {
 		msg = SuccessAccess
 	}
-	mgr.BASE(http.StatusOK, msg, data)
+	mgr.BASE(http.StatusOK, true, msg, data)
 }
 
 // FAIL 访问服务失败
@@ -42,7 +44,7 @@ func (mgr ResponseMgr) FAIL(msg string, data interface{}) {
 	if msg == "" {
 		msg = FailedAccess
 	}
-	mgr.BASE(http.StatusBadRequest, msg, data)
+	mgr.BASE(http.StatusBadRequest, false, msg, data)
 }
 
 // ERROR 应用程序内部异常
@@ -50,5 +52,5 @@ func (mgr ResponseMgr) ERROR(msg string, data interface{}) {
 	if msg == "" {
 		msg = ServerError
 	}
-	mgr.BASE(http.StatusInternalServerError, msg, data)
+	mgr.BASE(http.StatusInternalServerError, false, msg, data)
 }

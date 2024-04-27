@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/config"
 	"github.com/ahsen17/BlogServ/logger"
-	"github.com/ahsen17/BlogServ/router"
+	"github.com/ahsen17/BlogServ/src/router"
 	"github.com/gin-gonic/gin"
 )
 
-type Server struct {
+type ServMgr struct {
 }
 
-func (server *Server) RunServer() {
+func (mgr *ServMgr) RunServer() {
 	engine := gin.Default()
 	engine.SetTrustedProxies([]string{"localhost"})
 

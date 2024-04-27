@@ -83,7 +83,7 @@ func init() {
 }
 
 func InitGlobalVar() {
-	ConfDir = "./"
+	ConfDir = "./etc/"
 
 	ProjectEnv = DEV
 	switch ProjectEnv {
