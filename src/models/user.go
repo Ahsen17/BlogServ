@@ -1,3 +1,11 @@
+/*
+  Package models
+  @Author: Ahsen17
+  @Github: https://github.com/Ahsen17
+  @Time:
+  @Description: 用户管理
+*/
+
 package models
 
 type User struct {

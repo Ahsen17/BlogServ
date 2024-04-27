@@ -1,3 +1,11 @@
+/*
+  Package config
+  @Author: Ahsen17
+  @Github: https://github.com/Ahsen17
+  @Time:
+  @Description: 系统配置解析
+*/
+
 package config
 
 import (

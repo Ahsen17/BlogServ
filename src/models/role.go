@@ -1,3 +1,11 @@
+/*
+  Package models
+  @Author: Ahsen17
+  @Github: https://github.com/Ahsen17
+  @Time:
+  @Description: 角色及权限管理
+*/
+
 package models
 
 const (

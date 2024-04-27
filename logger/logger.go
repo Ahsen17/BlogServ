@@ -1,3 +1,11 @@
+/*
+  Package logger
+  @Author: Ahsen17
+  @Github: https://github.com/Ahsen17
+  @Time:
+  @Description: 系统日志打印
+*/
+
 package logger
 
 import (
