@@ -17,14 +17,12 @@ import (
 )
 
 const (
-	TABLE = "account"
+	TableAccount = "account"
 
 	ACTIVE     = 1
 	DEACTIVATE = 2
 	REVOKE     = 3
 	BANED      = 9
-
-	DefaultAccount = SYSTEM
 
 	ExpireTime = 12 * 3600
 )
@@ -36,11 +34,12 @@ type Account struct {
 	Status   int    `json:"status"`
 	CreateBy string `json:"create_by"`
 	UpdateBy string `json:"update_by"`
+	Data     AccountData
 }
 
 type AccountData struct {
-	LastLoginTime int64
-	LastLoginIp   string
+	LastLoginTime int64  `json:"login_time"`
+	LastLoginIp   string `json:"login_ip"`
 }
 
 type AccountMgr struct {
@@ -56,15 +55,15 @@ type AccountMgr struct {
 }
 
 func (a Account) TableName() string {
-	return TABLE
+	return TableAccount
 }
 
 func (mgr *AccountMgr) Exists() bool {
-	return mgr.DBClient.Where("username = ?", mgr.Account.Username).First(&mgr.Account).RowsAffected > 0
+	return mgr.DBClient.Table(TableAccount).Where("username = ?", mgr.Account.Username).First(&mgr.Account).RowsAffected > 0
 }
 
 func (mgr *AccountMgr) CheckPassword() bool {
-	return mgr.DBClient.Where(
+	return mgr.DBClient.Table(TableAccount).Where(
 		"username = ?, password = ?",
 		mgr.Account.Username,
 		mgr.Account.Password,
@@ -85,7 +84,7 @@ func (mgr *AccountMgr) Register() bool {
 		return false
 	}
 	mgr.Account.Status = DEACTIVATE // 刚注册默认未激活
-	if err := mgr.DBClient.Create(&mgr.Account).Error; err != nil {
+	if err := mgr.DBClient.Table(TableAccount).Create(&mgr.Account).Error; err != nil {
 		logger.Errorf("注册用户[%s]失败: %s", mgr.Account.Username, err)
 		return false
 	}
@@ -163,7 +162,7 @@ func (mgr *AccountMgr) Ban(username []string) (bool, string) {
 	if username == nil {
 		return false, ""
 	}
-	if mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", BANED).Error != nil {
+	if mgr.DBClient.Table(TableAccount).Where("username IN ?", username).Update("status", BANED).Error != nil {
 		return false, fmt.Sprintf("封禁账户[%s]失败", strings.Join(username, ","))
 	}
 	return true, "封禁成功"
@@ -173,7 +172,7 @@ func (mgr *AccountMgr) Unban(username []string) (bool, string) {
 	if username == nil {
 		return false, ""
 	}
-	if mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", ACTIVE).Error != nil {
+	if mgr.DBClient.Table(TableAccount).Where("username IN ?", username).Update("status", ACTIVE).Error != nil {
 		return false, fmt.Sprintf("解禁账户[%s]失败", strings.Join(username, ","))
 	}
 	return true, "解除封禁成功"
@@ -183,7 +182,7 @@ func (mgr *AccountMgr) Revoke() (bool, string) {
 	if !mgr.Exists() {
 		return false, fmt.Sprintf("账户[%s]不存在,注销失败", mgr.Account.Username)
 	}
-	if mgr.DBClient.Where("username = ?", mgr.Account.Username).Update("status", REVOKE).Error != nil {
+	if mgr.DBClient.Table(TableAccount).Where("username = ?", mgr.Account.Username).Update("status", REVOKE).Error != nil {
 		return false, "注销失败,未知错误"
 	}
 	return true, "注销成功"
