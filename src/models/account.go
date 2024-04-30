@@ -84,6 +84,7 @@ func (mgr *AccountMgr) Register() bool {
 		logger.Errorf("用户[%s]已存在", mgr.Account.Username)
 		return false
 	}
+	mgr.Account.Status = DEACTIVATE // 刚注册默认未激活
 	if err := mgr.DBClient.Create(&mgr.Account).Error; err != nil {
 		logger.Errorf("注册用户[%s]失败: %s", mgr.Account.Username, err)
 		return false
@@ -97,13 +98,11 @@ func (mgr *AccountMgr) Login() (bool, string) {
 	// 判断账户是否存在/密码是否正确
 	if !mgr.Exists() || !mgr.CheckPassword() {
 		info := fmt.Sprintf("账户[%s]不存在或密码错误", username)
-		logger.Error(info)
 		return false, info
 	}
 
 	// 判断是否已登录
 	if mgr.IfLoginIn() {
-		logger.Error("请勿重复登录")
 		return false, "请勿重复登录"
 	}
 
@@ -164,7 +163,7 @@ func (mgr *AccountMgr) Ban(username []string) (bool, string) {
 	if username == nil {
 		return false, ""
 	}
-	if err := mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", BANED).Error; err != nil {
+	if mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", BANED).Error != nil {
 		return false, fmt.Sprintf("封禁账户[%s]失败", strings.Join(username, ","))
 	}
 	return true, "封禁成功"
@@ -174,12 +173,18 @@ func (mgr *AccountMgr) Unban(username []string) (bool, string) {
 	if username == nil {
 		return false, ""
 	}
-	if err := mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", ACTIVE).Error; err != nil {
+	if mgr.DBClient.Table(TABLE).Where("username IN ?", username).Update("status", ACTIVE).Error != nil {
 		return false, fmt.Sprintf("解禁账户[%s]失败", strings.Join(username, ","))
 	}
 	return true, "解除封禁成功"
 }
 
-func (mgr *AccountMgr) Revoke() error {
-	return nil
+func (mgr *AccountMgr) Revoke() (bool, string) {
+	if !mgr.Exists() {
+		return false, fmt.Sprintf("账户[%s]不存在,注销失败", mgr.Account.Username)
+	}
+	if mgr.DBClient.Where("username = ?", mgr.Account.Username).Update("status", REVOKE).Error != nil {
+		return false, "注销失败,未知错误"
+	}
+	return true, "注销成功"
 }
