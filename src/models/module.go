@@ -38,7 +38,7 @@ func (m Module) TableName() string {
 
 // Exists 检查模块是否存在
 func (m *ModuleMgr) Exists() bool {
-	return m.DBClient.Where("url = ?", m.Module.URL).First(&m.Module).RowsAffected > 0
+	return m.DBClient.Table(TableModule).Where("url = ?", m.Module.URL).First(&m.Module).RowsAffected > 0
 }
 
 // Access 检查访问权限
@@ -57,7 +57,7 @@ func (m *ModuleMgr) Register() bool {
 		logger.Errorf("模块[%s]已存在", m.Module.Name)
 		return false
 	}
-	if err := m.DBClient.Create(&m.Module).Error; err != nil {
+	if err := m.DBClient.Table(TableModule).Create(&m.Module).Error; err != nil {
 		logger.Errorf("注册[%s]模块失败: %s", m.Module.Name, err)
 		return false
 	}
@@ -71,7 +71,7 @@ func (m *ModuleMgr) Parent() *Module {
 		return nil
 	}
 	var module *Module
-	if err := m.DBClient.Where("id = ?", m.Module.Parent).First(&module).Error; err != nil {
+	if err := m.DBClient.Table(TableModule).Where("id = ?", m.Module.Parent).First(&module).Error; err != nil {
 		logger.Errorf("获取父模块失败: %s", err)
 		return nil
 	}
@@ -81,7 +81,7 @@ func (m *ModuleMgr) Parent() *Module {
 // Children 获取子模块
 func (m *ModuleMgr) Children() []*Module {
 	var modules []*Module
-	if err := m.DBClient.Where("parent = ?", m.Module.ID).Find(&modules).Error; err != nil {
+	if err := m.DBClient.Table(TableModule).Where("parent = ?", m.Module.ID).Find(&modules).Error; err != nil {
 		logger.Errorf("获取子模块失败: %s", err)
 		return nil
 	}
