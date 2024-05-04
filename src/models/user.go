@@ -20,7 +20,7 @@ const (
 type User struct {
 	gorm.Model
 	Info UserInfo `json:"info"`
-	Data UserData `json:"data"`
+	Data UserData `json:"datasource"`
 }
 
 type UserInfo struct {
