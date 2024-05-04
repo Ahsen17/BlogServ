@@ -59,7 +59,9 @@ func (a Account) TableName() string {
 }
 
 func (mgr *AccountMgr) Exists() bool {
-	return mgr.DBClient.Table(TableAccount).Where("username = ?", mgr.Account.Username).First(&mgr.Account).RowsAffected > 0
+	var count int64
+	mgr.DBClient.Table(TableAccount).Where("username = ?", mgr.Account.Username).Count(&count)
+	return count > 0
 }
 
 func (mgr *AccountMgr) CheckPassword() bool {

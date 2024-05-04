@@ -38,7 +38,9 @@ func (m Module) TableName() string {
 
 // Exists 检查模块是否存在
 func (m *ModuleMgr) Exists() bool {
-	return m.DBClient.Table(TableModule).Where("url = ?", m.Module.URL).First(&m.Module).RowsAffected > 0
+	var count int64
+	m.DBClient.Table(TableModule).Where("username = ?", m.Module.Name).Count(&count)
+	return count > 0
 }
 
 // Access 检查访问权限

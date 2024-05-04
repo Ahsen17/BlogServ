@@ -49,9 +49,9 @@ func (user User) TableName() string {
 
 // Exist 检查用户是否存在
 func (m *UserMgr) Exist() bool {
-	return m.DBClient.Table(TableAccount).Where(
-		"username = ?", m.User.Info.Nickname,
-	).First(&m.User).RowsAffected > 0
+	var count int64
+	m.DBClient.Table(TableUser).Where("username = ?", m.User.Info.Nickname).Count(&count)
+	return count > 0
 }
 
 // Create 创建用户
