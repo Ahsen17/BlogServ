@@ -18,13 +18,14 @@ import (
 
 const (
 	TableAccount = "account"
+	ExpireTime   = 12 * 3600
+)
 
+const (
 	ACTIVE     = 1
 	DEACTIVATE = 2
 	REVOKE     = 3
 	BANED      = 9
-
-	ExpireTime = 12 * 3600
 )
 
 type Account struct {
