@@ -14,7 +14,9 @@ import (
 
 const (
 	TableNotify = "notify"
+)
 
+const (
 	AnonymousMsg = iota
 	PlatformMsg
 	PlatformNotify

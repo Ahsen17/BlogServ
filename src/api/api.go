@@ -10,39 +10,18 @@ package api
 
 import (
 	"github.com/ahsen17/BlogServ/logger"
+	data "github.com/ahsen17/BlogServ/src/data"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+var (
+	dbClient = data.DBClient()
+	cache    = data.CacheClient()
+)
+
 func init() {
 
-}
-
-func NoContentHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"success": true,
-		"message": "无内容",
-		"data":    nil,
-	})
-}
-
-func NotFoundHandler(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{
-		"code":    http.StatusNotFound,
-		"success": false,
-		"message": "未找到相关内容",
-		"data":    nil,
-	})
-}
-
-func ServerErrorHandler(c *gin.Context) {
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"code":    http.StatusInternalServerError,
-		"success": false,
-		"message": "系统错误",
-		"data":    nil,
-	})
 }
 
 // BasePath在同一个模块中定义一次即可
