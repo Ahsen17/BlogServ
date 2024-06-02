@@ -44,7 +44,7 @@ func OnLoginRequest(ctx *gin.Context) {
 	if ok, msg := accMgr.Login(ctx); !ok {
 		resp.ERROR(msg, nil)
 	} else {
-		resp.OK(msg, &accMgr.Account)
+		resp.OK("登陆成功", msg)
 	}
 }
 
@@ -58,7 +58,7 @@ func OnLogoutRequest(ctx *gin.Context) {
 		return
 	}
 
-	if ok := accMgr.Logout(); !ok {
+	if ok := accMgr.Logout(ctx); !ok {
 		resp.ERROR("退出登录异常", nil)
 	} else {
 		resp.OK("已注销", &accMgr.Account)

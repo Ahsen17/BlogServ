@@ -11,6 +11,7 @@ package models
 import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/logger"
+	"github.com/ahsen17/BlogServ/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
@@ -32,8 +33,8 @@ const (
 
 type Account struct {
 	gorm.Model
-	Username      string `json:"username"`
-	Password      string `json:"password"`
+	Username      string `json:"username" gorm:"unique;not null;size:12"`
+	Password      string `json:"password" gorm:"not null;size:32"`
 	Status        int    `json:"status"`
 	CreateBy      string `json:"create_by"`
 	UpdateBy      string `json:"update_by"`
@@ -107,28 +108,47 @@ func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 		return false, info
 	}
 
-	//ipAddress := ctx.ClientIP()
-	//loginUuid := uuid.New()
-
-	// TODO: 生成访问密钥
-	var authString string
+	// 生成访问密钥
+	servTool := tools.ServTool{}
+	clientIP := servTool.FetchRemoteIp(ctx)
+	token, err := servTool.GenerateAccessKey(username, clientIP)
+	if err != nil {
+		info := fmt.Sprintf("生成登录秘钥失败: %s", err)
+		logger.Error(info)
+		return false, info
+	}
 	// ExpireTime 单位被识别成微秒，导致一注册值后立马过期
 	//mgr.Cache.Set(username, authString, ExpireTime)
-	mgr.Cache.Set(username, authString, time.Minute*ExpireTime)
+	mgr.Cache.Set(username, token, time.Minute*ExpireTime)
 
-	return true, authString
+	return true, token
 }
 
-func (mgr *AccountMgr) Logout() bool {
+func (mgr *AccountMgr) Logout(ctx *gin.Context) bool {
 	// 检查登录状态
 	if !mgr.IfLoginIn() {
 		logger.Error("请先登录")
 		return false
 	}
 
+	// TODO: 验证访问秘钥（需要在鉴权中间件中实现）
+	token := ctx.Request.Header.Get("Authorization")
+	if result, err := mgr.Cache.Get(mgr.Account.Username).Result(); err != nil || token != result {
+		// 缓存获取token失败或token匹配失败
+		return false
+	}
+	// 校验token中的IP与当前访问的实际IP
+	servTool := tools.ServTool{}
+	info, _ := servTool.DecryptAccessKey(token)
+	remoteIP := servTool.FetchRemoteIp(ctx)
+	infoDetail := strings.Split(info, "@")
+	if infoDetail[0] != mgr.Account.Username || infoDetail[1] != remoteIP {
+		// token校验失败
+		return false
+	}
+
 	// 注销登录
-	err := mgr.Cache.Del(mgr.Account.Username).Err()
-	if err != nil {
+	if err := mgr.Cache.Del(mgr.Account.Username).Err(); err != nil {
 		logger.Errorf("注销登录失败")
 		return false
 	}
