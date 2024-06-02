@@ -19,11 +19,6 @@ const (
 
 type User struct {
 	gorm.Model
-	Info UserInfo `json:"info"`
-	Data UserData `json:"datasource"`
-}
-
-type UserInfo struct {
 	Avatar   string     `json:"avatar"`
 	Nickname string     `json:"nickname"`
 	Sex      uint       `json:"sex"`
@@ -33,13 +28,8 @@ type UserInfo struct {
 	Site     string     `json:"site"`
 }
 
-type UserData struct {
-}
-
 type UserMgr struct {
 	User     *User
-	UserData *UserData
-
 	DBClient *gorm.DB
 }
 
@@ -50,7 +40,7 @@ func (user User) TableName() string {
 // Exist 检查用户是否存在
 func (m *UserMgr) Exist() bool {
 	var count int64
-	m.DBClient.Table(TableUser).Where("username = ?", m.User.Info.Nickname).Count(&count)
+	m.DBClient.Table(TableUser).Where("username = ?", m.User.Nickname).Count(&count)
 	return count > 0
 }
 

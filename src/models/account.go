@@ -11,9 +11,11 @@ package models
 import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/logger"
+	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 	"strings"
+	"time"
 )
 
 const (
@@ -22,31 +24,25 @@ const (
 )
 
 const (
-	ACTIVE     = 1
-	DEACTIVATE = 2
-	REVOKE     = 3
-	BANED      = 9
+	ACTIVE = iota + 1
+	DEACTIVATE
+	REVOKE
+	BANED = 9
 )
 
 type Account struct {
 	gorm.Model
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Status   int    `json:"status"`
-	CreateBy string `json:"create_by"`
-	UpdateBy string `json:"update_by"`
-	Data     AccountData
-}
-
-type AccountData struct {
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	Status        int    `json:"status"`
+	CreateBy      string `json:"create_by"`
+	UpdateBy      string `json:"update_by"`
 	LastLoginTime int64  `json:"login_time"`
 	LastLoginIp   string `json:"login_ip"`
 }
 
 type AccountMgr struct {
-	Account     *Account
-	AccountData *AccountData
-
+	Account      *Account
 	UserMgr      *UserMgr
 	RoleMgr      *RoleMgr
 	CustomLogMgr *CustomLogMgr // 用户操作日志
@@ -67,7 +63,7 @@ func (mgr *AccountMgr) Exists() bool {
 
 func (mgr *AccountMgr) CheckPassword() bool {
 	return mgr.DBClient.Table(TableAccount).Where(
-		"username = ?, password = ?",
+		"username = ? AND password = ?",
 		mgr.Account.Username,
 		mgr.Account.Password,
 	).First(&mgr.Account).RowsAffected > 0
@@ -75,10 +71,7 @@ func (mgr *AccountMgr) CheckPassword() bool {
 
 func (mgr *AccountMgr) IfLoginIn() bool {
 	exists, err := mgr.Cache.Exists(mgr.Account.Username).Result()
-	if err != nil || exists != 0 {
-		return true
-	}
-	return false
+	return err == nil && exists != 0
 }
 
 func (mgr *AccountMgr) Register() bool {
@@ -94,13 +87,12 @@ func (mgr *AccountMgr) Register() bool {
 	return true
 }
 
-func (mgr *AccountMgr) Login() (bool, string) {
+func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 	username := mgr.Account.Username
 
 	// 判断账户是否存在/密码是否正确
 	if !mgr.Exists() || !mgr.CheckPassword() {
-		info := fmt.Sprintf("账户[%s]不存在或密码错误", username)
-		return false, info
+		return false, fmt.Sprintf("账户[%s]不存在或密码错误", username)
 	}
 
 	// 判断是否已登录
@@ -115,9 +107,14 @@ func (mgr *AccountMgr) Login() (bool, string) {
 		return false, info
 	}
 
+	//ipAddress := ctx.ClientIP()
+	//loginUuid := uuid.New()
+
 	// TODO: 生成访问密钥
 	var authString string
-	mgr.Cache.Set(username, authString, ExpireTime)
+	// ExpireTime 单位被识别成微秒，导致一注册值后立马过期
+	//mgr.Cache.Set(username, authString, ExpireTime)
+	mgr.Cache.Set(username, authString, time.Minute*ExpireTime)
 
 	return true, authString
 }

@@ -1,9 +1,11 @@
 package main
 
-import "github.com/ahsen17/BlogServ/src/server"
+import (
+	"github.com/ahsen17/BlogServ/src"
+)
 
 func main() {
-	serverMgr := server.ServMgr{}
+	serverMgr := src.ServMgr{}
 
 	serverMgr.RunServer()
 }

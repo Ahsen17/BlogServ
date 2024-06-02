@@ -16,7 +16,8 @@ import (
 const (
 	SuccessAccess = "访问成功"
 	FailedAccess  = "访问失败"
-	ServerError   = "服务器响应失败"
+	ServerError   = "服务异常"
+	NotFound      = "资源未找到"
 )
 
 type Response struct {
@@ -61,4 +62,12 @@ func (mgr ResponseMgr) ERROR(msg string, data interface{}) {
 		msg = ServerError
 	}
 	mgr.BASE(http.StatusInternalServerError, false, msg, data)
+}
+
+// NOTFOUND 访问资源未找到
+func (mgr ResponseMgr) NOTFOUND(msg string, data interface{}) {
+	if msg == "" {
+		msg = NotFound
+	}
+	mgr.BASE(http.StatusNotFound, true, msg, data)
 }

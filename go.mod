@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/google/uuid v1.6.0
 	github.com/pelletier/go-toml/v2 v2.0.8
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1

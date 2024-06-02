@@ -1,10 +1,10 @@
-package server
+package src
 
 import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/config"
 	"github.com/ahsen17/BlogServ/logger"
-	"github.com/ahsen17/BlogServ/src/router"
+	"github.com/ahsen17/BlogServ/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ func (mgr *ServMgr) RunServer() {
 	engine.SetTrustedProxies([]string{"localhost"})
 
 	// 初始化系统路由
-	router.InitRouter(engine)
+	router.CollectRouters(engine)
 
 	// 启动服务
 	serverConfig := config.ServerConfig()
