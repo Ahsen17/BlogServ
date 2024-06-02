@@ -11,21 +11,19 @@ package tools
 import (
 	"crypto/aes"
 	"encoding/hex"
+	"github.com/google/uuid"
 )
 
-var salt = "blogserv@github.com/ahsen17"
+var salt = "blogserv@github.com//AhsenEdward"
 
 // encryptAES AES加密
 func encryptAES(key string, plainText string) (string, error) {
-
 	cipher, err := aes.NewCipher([]byte(key))
-
 	if err != nil {
 		return "", err
 	}
 
 	out := make([]byte, len(plainText))
-
 	cipher.Encrypt(out, []byte(plainText))
 
 	return hex.EncodeToString(out), nil
@@ -33,13 +31,12 @@ func encryptAES(key string, plainText string) (string, error) {
 
 // decryptAES AES解密
 func decryptAES(key string, encryptText string) (string, error) {
-	decodeText, _ := hex.DecodeString(encryptText)
-
 	cipher, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
 	}
 
+	decodeText, _ := hex.DecodeString(encryptText)
 	out := make([]byte, len(decodeText))
 	cipher.Decrypt(out, decodeText)
 
@@ -48,7 +45,7 @@ func decryptAES(key string, encryptText string) (string, error) {
 
 // EncryptAES 加密
 func EncryptAES(plainText string) (string, error) {
-	return encryptAES(salt, plainText)
+	return encryptAES(salt, (plainText + "_" + uuid.NewString())[:32])
 }
 
 // DecryptAES 解密
