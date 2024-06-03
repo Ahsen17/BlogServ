@@ -18,6 +18,10 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+type RoutesMgr struct {
+	Engine *gin.Engine
+}
+
 // 参考下开源项目RouterGroup的用法
 
 // NoContentHandler 返回无内容
@@ -36,7 +40,8 @@ func ServerErrorHandler(c *gin.Context) {
 }
 
 // CollectRouters 初始化应用路由
-func CollectRouters(engine *gin.Engine) {
+func (rm RoutesMgr) CollectRouters() {
+	engine := rm.Engine
 	// 系统路由
 	mainGrp := engine.Group("")
 	{
@@ -50,6 +55,11 @@ func CollectRouters(engine *gin.Engine) {
 	collectSearchRouters(engine)
 	collectModuleRouters(engine)
 	collectApiRouters(engine)
+}
+
+func (rm RoutesMgr) RegisterMiddlewares(middleware ...gin.HandlerFunc) {
+	engine := rm.Engine
+	engine.Use(middleware...)
 }
 
 func collectTeleportRouters(e *gin.Engine) {

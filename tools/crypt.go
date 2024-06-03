@@ -11,7 +11,6 @@ package tools
 import (
 	"crypto/aes"
 	"encoding/hex"
-	"github.com/google/uuid"
 )
 
 var salt = "blogserv@github.com//AhsenEdward"
@@ -45,7 +44,7 @@ func decryptAES(key string, encryptText string) (string, error) {
 
 // EncryptAES 加密
 func EncryptAES(plainText string) (string, error) {
-	return encryptAES(salt, (plainText + "_" + uuid.NewString())[:32])
+	return encryptAES(salt, plainText)
 }
 
 // DecryptAES 解密

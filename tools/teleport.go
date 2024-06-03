@@ -3,6 +3,7 @@ package tools
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ func (st ServTool) FetchRemoteIp(ctx *gin.Context) string {
 // GenerateAccessKey 生成访问密钥
 func (st ServTool) GenerateAccessKey(username string, ipAddress string) (string, error) {
 	plainText := fmt.Sprintf("%s@%s", username, ipAddress)
-	return EncryptAES(plainText)
+	return EncryptAES((plainText + "_" + uuid.NewString())[:32])
 }
 
 // DecryptAccessKey 解密访问密钥

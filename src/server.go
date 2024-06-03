@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/config"
 	"github.com/ahsen17/BlogServ/logger"
-	"github.com/ahsen17/BlogServ/router"
+	"github.com/ahsen17/BlogServ/src/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,8 +15,14 @@ func (mgr *ServMgr) RunServer() {
 	engine := gin.Default()
 	engine.SetTrustedProxies([]string{"localhost"})
 
-	// 初始化系统路由
-	router.CollectRouters(engine)
+	routesMgr := router.RoutesMgr{Engine: engine}
+	// 注册中间件
+	routesMgr.RegisterMiddlewares(
+		GlobalLoginStatusMiddleware,
+		GlobalUserAuthMiddleware,
+	)
+	// 初始化路由
+	routesMgr.CollectRouters()
 
 	// 启动服务
 	serverConfig := config.ServerConfig()

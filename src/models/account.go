@@ -90,6 +90,7 @@ func (mgr *AccountMgr) Register() bool {
 
 func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 	username := mgr.Account.Username
+	logger.Info("登录账户: %s", username)
 
 	// 判断账户是否存在/密码是否正确
 	if !mgr.Exists() || !mgr.CheckPassword() {
@@ -124,26 +125,10 @@ func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 	return true, token
 }
 
-func (mgr *AccountMgr) Logout(ctx *gin.Context) bool {
+func (mgr *AccountMgr) Logout() bool {
 	// 检查登录状态
 	if !mgr.IfLoginIn() {
 		logger.Error("请先登录")
-		return false
-	}
-
-	// TODO: 验证访问秘钥（需要在鉴权中间件中实现）
-	token := ctx.Request.Header.Get("Authorization")
-	if result, err := mgr.Cache.Get(mgr.Account.Username).Result(); err != nil || token != result {
-		// 缓存获取token失败或token匹配失败
-		return false
-	}
-	// 校验token中的IP与当前访问的实际IP
-	servTool := tools.ServTool{}
-	info, _ := servTool.DecryptAccessKey(token)
-	remoteIP := servTool.FetchRemoteIp(ctx)
-	infoDetail := strings.Split(info, "@")
-	if infoDetail[0] != mgr.Account.Username || infoDetail[1] != remoteIP {
-		// token校验失败
 		return false
 	}
 
