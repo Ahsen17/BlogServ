@@ -72,7 +72,7 @@ func collectTeleportRouters(e *gin.Engine) {
 	// 账户操作路由
 	accountGrp := teleportGrp.Group("/account")
 	{
-		accountGrp.POST("/register", teleport.RegisterAccountRequest)
+		accountGrp.POST("/register", teleport.OnRegisterRequest)
 		accountGrp.POST("/login", teleport.OnLoginRequest)
 		accountGrp.POST("/logout", teleport.OnLogoutRequest)
 	}

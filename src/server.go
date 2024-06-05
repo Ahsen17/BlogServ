@@ -18,7 +18,6 @@ func (mgr *ServMgr) RunServer() {
 	routesMgr := router.RoutesMgr{Engine: engine}
 	// 注册中间件
 	routesMgr.RegisterMiddlewares(
-		GlobalLoginStatusMiddleware,
 		GlobalUserAuthMiddleware,
 	)
 	// 初始化路由

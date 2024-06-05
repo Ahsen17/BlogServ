@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"github.com/ahsen17/BlogServ/logger"
 	"github.com/ahsen17/BlogServ/tools"
-	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
 	"strings"
@@ -70,11 +69,6 @@ func (mgr *AccountMgr) CheckPassword() bool {
 	).First(&mgr.Account).RowsAffected > 0
 }
 
-func (mgr *AccountMgr) IfLoginIn() bool {
-	exists, err := mgr.Cache.Exists(mgr.Account.Username).Result()
-	return err == nil && exists != 0
-}
-
 func (mgr *AccountMgr) Register() bool {
 	if mgr.Exists() {
 		logger.Errorf("用户[%s]已存在", mgr.Account.Username)
@@ -88,18 +82,12 @@ func (mgr *AccountMgr) Register() bool {
 	return true
 }
 
-func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
+func (mgr *AccountMgr) Login(clientIP string) (bool, string) {
 	username := mgr.Account.Username
-	logger.Info("登录账户: %s", username)
 
 	// 判断账户是否存在/密码是否正确
 	if !mgr.Exists() || !mgr.CheckPassword() {
 		return false, fmt.Sprintf("账户[%s]不存在或密码错误", username)
-	}
-
-	// 判断是否已登录
-	if mgr.IfLoginIn() {
-		return false, "请勿重复登录"
 	}
 
 	// 判断是否可用
@@ -111,8 +99,7 @@ func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 
 	// 生成访问密钥
 	servTool := tools.ServTool{}
-	clientIP := servTool.FetchRemoteIp(ctx)
-	token, err := servTool.GenerateAccessKey(username, clientIP)
+	newToken, err := servTool.GenerateAccessKey(username, clientIP)
 	if err != nil {
 		info := fmt.Sprintf("生成登录秘钥失败: %s", err)
 		logger.Error(info)
@@ -120,23 +107,13 @@ func (mgr *AccountMgr) Login(ctx *gin.Context) (bool, string) {
 	}
 	// ExpireTime 单位被识别成微秒，导致一注册值后立马过期
 	//mgr.Cache.Set(username, authString, ExpireTime)
-	mgr.Cache.Set(username, token, time.Minute*ExpireTime)
+	mgr.Cache.Set(newToken, 1, time.Minute*ExpireTime)
 
-	return true, token
+	return true, newToken
 }
 
 func (mgr *AccountMgr) Logout() bool {
-	// 检查登录状态
-	if !mgr.IfLoginIn() {
-		logger.Error("请先登录")
-		return false
-	}
-
-	// 注销登录
-	if err := mgr.Cache.Del(mgr.Account.Username).Err(); err != nil {
-		logger.Errorf("注销登录失败")
-		return false
-	}
+	// 无需额外操作
 	return true
 }
 
